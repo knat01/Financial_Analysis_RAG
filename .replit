@@ -82,6 +82,7 @@ args = """
 
 [deployment]
 run = ["sh", "-c", "streamlit run app.py --server.port 5000"]
+deploymentTarget = "cloudrun"
 
 [[ports]]
 localPort = 5000
