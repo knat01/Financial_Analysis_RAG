@@ -91,12 +91,14 @@ def process_financial_data(financial_data):
 
     try:
         revenue = float(income_statement['totalRevenue'])
+        metrics['Revenue'] = revenue
     except (KeyError, ValueError, TypeError) as e:
         print(f"Error calculating revenue: {e}")
         revenue = None
 
     try:
         cogs = float(income_statement['costOfRevenue'])
+        metrics['Cost of Goods Sold'] = cogs
     except (KeyError, ValueError, TypeError) as e:
         print(f"Error calculating cost of revenue: {e}")
         cogs = None
@@ -104,10 +106,12 @@ def process_financial_data(financial_data):
     if revenue is not None and cogs is not None:
         gross_profit = revenue - cogs
         gross_profit_margin = (gross_profit / revenue) * 100 if revenue != 0 else None
+        metrics['Gross Profit'] = gross_profit
         metrics['Gross Profit Margin (%)'] = round(gross_profit_margin, 2) if gross_profit_margin is not None else None
 
     try:
         net_income = float(income_statement['netIncome'])
+        metrics['Net Income'] = net_income
     except (KeyError, ValueError, TypeError) as e:
         print(f"Error calculating net income: {e}")
         net_income = None
@@ -125,6 +129,7 @@ def process_financial_data(financial_data):
         print(f"Error calculating current ratio: {e}")
 
     try:
+        total_assets = float(balance_sheet['totalAssets'])
         total_liabilities = float(balance_sheet['totalLiabilities'])
         total_shareholder_equity = float(balance_sheet['totalShareholderEquity'])
         debt_to_equity = total_liabilities / total_shareholder_equity if total_shareholder_equity != 0 else None
@@ -135,12 +140,12 @@ def process_financial_data(financial_data):
     try:
         operating_cash_flow = float(cash_flow['operatingCashflow'])
         operating_cash_flow_margin = (operating_cash_flow / revenue) * 100 if revenue != 0 else None
+        metrics['Operating Cash Flow'] = operating_cash_flow
         metrics['Operating Cash Flow Margin (%)'] = round(operating_cash_flow_margin, 2) if operating_cash_flow_margin is not None else None
     except (KeyError, ValueError, TypeError) as e:
         print(f"Error calculating operating cash flow margin: {e}")
 
     try:
-        total_assets = float(balance_sheet['totalAssets'])
         roa = (net_income / total_assets) * 100 if total_assets != 0 else None
         metrics['Return on Assets (%)'] = round(roa, 2) if roa is not None else None
     except (KeyError, ValueError, TypeError) as e:
@@ -186,6 +191,29 @@ def process_financial_data(financial_data):
         metrics['Free Cash Flow Yield (%)'] = round(free_cash_flow_yield, 2) if free_cash_flow_yield is not None else None
     except (KeyError, ValueError, TypeError) as e:
         print(f"Error calculating Free Cash Flow Yield: {e}")
+
+    # New metrics
+    try:
+        book_value = float(balance_sheet['totalShareholderEquity'])
+        price_to_book = market_cap / book_value if book_value != 0 else None
+        metrics['Price-to-Book Ratio'] = round(price_to_book, 2) if price_to_book is not None else None
+    except (KeyError, ValueError, TypeError) as e:
+        print(f"Error calculating Price-to-Book Ratio: {e}")
+
+    try:
+        dividends_paid = abs(float(cash_flow.get('cashDividendsPaid', 0)))
+        dividend_yield = (dividends_paid / market_cap) * 100 if market_cap != 0 else None
+        metrics['Dividend Yield (%)'] = round(dividend_yield, 2) if dividend_yield is not None else None
+    except (KeyError, ValueError, TypeError) as e:
+        print(f"Error calculating Dividend Yield: {e}")
+
+    try:
+        ebit = float(income_statement.get('ebit', 0))
+        invested_capital = total_shareholder_equity + total_debt
+        roic = (ebit / invested_capital) * 100 if invested_capital != 0 else None
+        metrics['Return on Invested Capital (ROIC) (%)'] = round(roic, 2) if roic is not None else None
+    except (KeyError, ValueError, TypeError) as e:
+        print(f"Error calculating Return on Invested Capital: {e}")
 
     if all(metric is None for metric in metrics.values()):
         print("No valid financial metrics could be calculated")
@@ -262,6 +290,28 @@ def process_financial_data(financial_data):
         charts.append(fig_free_cash_flow)
     except Exception as e:
         print(f"Error creating Free Cash Flow chart: {e}")
+
+    # New chart: Return on Invested Capital (ROIC) over time
+    try:
+        roic_data = pd.DataFrame(financial_data['income_statement'].get('annualReports', financial_data['income_statement'].get('quarterlyReports', [])))
+        roic_data['fiscalDateEnding'] = pd.to_datetime(roic_data['fiscalDateEnding'])
+        roic_data['ebit'] = roic_data['ebit'].astype(float)
+        
+        balance_sheet_data = pd.DataFrame(financial_data['balance_sheet'].get('annualReports', financial_data['balance_sheet'].get('quarterlyReports', [])))
+        balance_sheet_data['fiscalDateEnding'] = pd.to_datetime(balance_sheet_data['fiscalDateEnding'])
+        balance_sheet_data['totalShareholderEquity'] = balance_sheet_data['totalShareholderEquity'].astype(float)
+        balance_sheet_data['shortLongTermDebtTotal'] = balance_sheet_data['shortLongTermDebtTotal'].astype(float)
+        
+        roic_data = pd.merge(roic_data, balance_sheet_data[['fiscalDateEnding', 'totalShareholderEquity', 'shortLongTermDebtTotal']], on='fiscalDateEnding')
+        roic_data['investedCapital'] = roic_data['totalShareholderEquity'] + roic_data['shortLongTermDebtTotal']
+        roic_data['roic'] = (roic_data['ebit'] / roic_data['investedCapital']) * 100
+        roic_data = roic_data.sort_values('fiscalDateEnding')
+
+        fig_roic = px.line(roic_data, x='fiscalDateEnding', y='roic', title='Return on Invested Capital (ROIC) Over Time')
+        fig_roic.update_layout(yaxis_title='ROIC (%)')
+        charts.append(fig_roic)
+    except Exception as e:
+        print(f"Error creating ROIC chart: {e}")
 
     metrics_df = pd.DataFrame(list(metrics.items()), columns=['Metric', 'Value'])
 
