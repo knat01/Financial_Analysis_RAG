@@ -19,6 +19,14 @@ args = "Start Streamlit App"
 task = "workflow.run"
 args = "API Test"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Commit"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Commit and Tag"
+
 [[workflows.workflow]]
 name = "Start Streamlit App"
 author = "agent"
@@ -41,6 +49,36 @@ agentRequireRestartOnSave = false
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python test_api.py"
+
+[[workflows.workflow]]
+name = "Git Commit"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git add . && git commit -m 'Checkpoint: Financial analysis tool with working annual report upload and analysis' && git status"
+
+[[workflows.workflow]]
+name = "Git Commit and Tag"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+    git config --global user.email \"ai.assistant@example.com\" &&
+    git config --global user.name \"AI Assistant\" &&
+    git add . &&
+    git commit -m \"Checkpoint: Financial analysis tool with working annual report upload and analysis\" &&
+    git tag -a v1.0 -m \"Version 1.0 - Working financial analysis tool\" &&
+    git describe --tags
+    """
 
 [deployment]
 run = ["sh", "-c", "streamlit run app.py --server.port 5000"]

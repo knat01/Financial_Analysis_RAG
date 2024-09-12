@@ -17,6 +17,8 @@ faiss-cpu = "^1.8.0.post1"
 python-dotenv = "^1.0.1"
 pymupdf = "^1.24.10"
 langchain-community = "^0.2.16"
+pypdf = "^4.3.1"
+tiktoken = "^0.7.0"
 
 
 [build-system]

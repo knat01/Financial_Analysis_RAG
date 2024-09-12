@@ -1,11 +1,9 @@
-# report_analysis.py
-
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
-import openai
+from langchain.llms import OpenAI
 import os
 
 def process_annual_report(uploaded_file, openai_api_key):
@@ -33,16 +31,17 @@ def process_annual_report(uploaded_file, openai_api_key):
     return vectorstore
 
 def answer_question_from_report(question, vectorstore, openai_api_key):
-    # Set OpenAI API key
-    openai.api_key = openai_api_key
-
     # Retrieve relevant documents
-    docs = vectorstore.similarity_search(question)
+    docs = vectorstore.similarity_search(question, k=4)
 
     # Load QA chain
-    chain = load_qa_chain(OpenAIEmbeddings(), chain_type="stuff")
+    llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
+    chain = load_qa_chain(llm, chain_type="stuff")
 
     # Get the answer
     answer = chain.run(input_documents=docs, question=question)
 
-    return answer
+    # Extract sources (actual text content)
+    sources = [doc.page_content for doc in docs]
+
+    return answer, sources

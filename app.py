@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 from data_processing import fetch_financial_data, process_financial_data, generate_financial_insights
 from report_analysis import process_annual_report, answer_question_from_report
@@ -9,8 +8,8 @@ def main():
 
     # Section to input API keys
     st.sidebar.header("API Keys")
-    openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password")
-    financial_api_key = st.sidebar.text_input("Financial Data API Key (e.g., Alpha Vantage)", type="password")
+    openai_api_key = st.sidebar.text_input("OpenAI API Key", type="password", value=os.environ.get("OPENAI_API_KEY", ""))
+    financial_api_key = st.sidebar.text_input("Financial Data API Key (e.g., Alpha Vantage)", type="password", value=os.environ.get("ALPHA_VANTAGE_API_KEY", ""))
 
     if not openai_api_key:
         st.warning("Please enter your OpenAI API key to continue.")
@@ -66,9 +65,13 @@ def main():
         if question:
             # Get answer from the report
             st.write("Generating answer...")
-            answer = answer_question_from_report(question, vectorstore, openai_api_key)
+            answer, sources = answer_question_from_report(question, vectorstore, openai_api_key)
             st.write("**Answer:**")
             st.write(answer)
+            st.write("**Relevant Sources:**")
+            for i, source in enumerate(sources, 1):
+                st.write(f"Source {i}:")
+                st.text(source)
 
 if __name__ == "__main__":
     main()
