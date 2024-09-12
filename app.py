@@ -6,8 +6,27 @@ import os
 
 def api_keys_page():
     st.header("API Keys")
+    
+    st.markdown('''
+    This application can work with the following financial data APIs:
+    1. **Alpha Vantage API**: Currently used for fetching financial data such as income statements, balance sheets, and cash flow statements.
+    2. **Tiingo**
+    3. **World Trading Data**
+    4. **Twelve Data**
+    5. **Polygon.io**
+    6. **Finnhub**
+    7. **Quandl**
+    8. **IEX Cloud**
+    9. **Yahoo Finance API**
+
+    The application also uses:
+    10. **OpenAI API**: Used for generating AI-powered insights based on the financial data and for analyzing annual reports.
+
+    Please enter your API keys below:
+    ''')
+    
     openai_api_key = st.text_input("OpenAI API Key", type="password", value=st.session_state.get('openai_api_key', ''))
-    financial_api_key = st.text_input("Financial Data API Key (e.g., Alpha Vantage)", type="password", value=st.session_state.get('financial_api_key', ''))
+    financial_api_key = st.text_input("Financial Data API Key (e.g., Alpha Vantage, Tiingo, etc.)", type="password", value=st.session_state.get('financial_api_key', ''))
     
     if st.button("Save API Keys"):
         st.session_state['openai_api_key'] = openai_api_key
