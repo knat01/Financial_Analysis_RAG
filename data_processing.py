@@ -1,9 +1,8 @@
-# data_processing.py
 import requests
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import openai
+from openai import OpenAI
 
 def fetch_financial_data(ticker, api_key):
     # Fetch data from Alpha Vantage API
@@ -113,30 +112,34 @@ def process_financial_data(financial_data):
     return metrics_df, charts
 
 def generate_financial_insights(metrics_df, openai_api_key):
-    # Use OpenAI API to generate insights based on the metrics
-    openai.api_key = openai_api_key
+    try:
+        # Use OpenAI API to generate insights based on the metrics
+        client = OpenAI(api_key=openai_api_key)
 
-    # Convert metrics dataframe to text
-    metrics_text = metrics_df.to_string(index=False)
+        # Convert metrics dataframe to text
+        metrics_text = metrics_df.to_string(index=False)
 
-    prompt = f"""
-    Analyze the following financial metrics and provide insights about the company's financial health:
+        prompt = f"""
+        Analyze the following financial metrics and provide insights about the company's financial health:
 
-    {metrics_text}
+        {metrics_text}
 
-    Focus on aspects like profitability, liquidity, and solvency.
-    """
+        Focus on aspects like profitability, liquidity, and solvency.
+        """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": "You are a financial analyst."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=500,
-        n=1,
-        temperature=0.7,
-    )
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are a financial analyst."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500,
+            n=1,
+            temperature=0.7,
+        )
 
-    insights = response.choices[0].message.content.strip()
-    return insights
+        insights = response.choices[0].message.content.strip()
+        return insights
+    except Exception as e:
+        print(f"Error generating financial insights: {str(e)}")
+        return "Unable to generate AI insights at this time. Please try again later."
