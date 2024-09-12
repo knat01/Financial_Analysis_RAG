@@ -4,31 +4,17 @@ from report_analysis import process_annual_report, answer_question_from_report
 from test_api import test_api
 import os
 
-def main():
-    st.set_page_config(page_title="Financial Insights Application", layout="wide")
-    st.title("Financial Insights Application")
-
-    # Create tabs
-    tab1, tab2, tab3 = st.tabs(["API Keys", "Financial Data", "Annual Report Analysis"])
-
-    with tab1:
-        api_keys_page()
-
-    with tab2:
-        financial_data_page()
-
-    with tab3:
-        annual_report_page()
-
 def api_keys_page():
     st.header("API Keys")
+    openai_api_key = st.text_input("OpenAI API Key", type="password", value=st.session_state.get('openai_api_key', ''))
+    financial_api_key = st.text_input("Financial Data API Key (e.g., Alpha Vantage)", type="password", value=st.session_state.get('financial_api_key', ''))
     
-    st.session_state['openai_api_key'] = st.text_input("Enter your OpenAI API Key:", type="password")
-    st.session_state['financial_api_key'] = st.text_input("Enter your Alpha Vantage API Key:", type="password")
-    
-    if st.button("Test API Connection"):
-        result = test_api()
-        st.write(result)
+    if st.button("Save API Keys"):
+        st.session_state['openai_api_key'] = openai_api_key
+        st.session_state['financial_api_key'] = financial_api_key
+        os.environ['OPENAI_API_KEY'] = openai_api_key
+        os.environ['ALPHA_VANTAGE_API_KEY'] = financial_api_key
+        st.success("API Keys saved successfully!")
 
 def financial_data_page():
     st.header("Financial Data Analysis")
@@ -53,45 +39,70 @@ def financial_data_page():
             for chart in charts:
                 st.plotly_chart(chart)
             
-            st.subheader("Advanced Metrics Explanation")
-            st.write("""
-            - **Return on Equity (ROE)**: Measures how efficiently a company uses its equity to generate profits.
-            - **Earnings Per Share (EPS)**: Indicates how much profit a company allocates to each outstanding share of common stock.
-            - **Price to Earnings (P/E) Ratio**: Compares a company's share price to its earnings per share.
-            - **Return on Assets (ROA)**: Shows how efficiently a company uses its assets to generate profits.
-            """)
-            
             st.subheader("AI-Generated Insights")
             insights = generate_financial_insights(metrics_df, st.session_state['openai_api_key'])
             st.write(insights)
         else:
             st.error("Failed to fetch financial data. Please check the ticker symbol and try again.")
 
-def annual_report_page():
-    st.header("Annual Report Analysis")
+def document_analysis_page():
+    st.header("Document Analysis")
     
     if 'openai_api_key' not in st.session_state:
         st.warning("Please enter your OpenAI API key in the API Keys tab.")
         return
     
-    uploaded_file = st.file_uploader("Upload an annual report (PDF)", type="pdf")
+    uploaded_file = st.file_uploader("Upload an annual report PDF", type=["pdf"])
     
-    if uploaded_file is not None:
-        st.write("Processing the uploaded annual report...")
+    if uploaded_file:
+        st.write("Processing annual report...")
         vectorstore = process_annual_report(uploaded_file, st.session_state['openai_api_key'])
         st.session_state['vectorstore'] = vectorstore
         st.success("Annual report processed successfully!")
+    
+    if 'vectorstore' in st.session_state:
+        question = st.text_input("Enter your question about the report")
         
-        question = st.text_input("Ask a question about the annual report:")
         if question:
-            if 'vectorstore' in st.session_state:
-                answer, sources = answer_question_from_report(question, st.session_state['vectorstore'], st.session_state['openai_api_key'])
-                st.write("Answer:", answer)
-                st.write("Sources:")
-                for i, source in enumerate(sources, 1):
-                    st.write(f"Source {i}:", source)
-            else:
-                st.error("Please upload and process an annual report before asking questions.")
+            st.write("Generating answer...")
+            answer, sources = answer_question_from_report(question, st.session_state['vectorstore'], st.session_state['openai_api_key'])
+            st.write("**Answer:**")
+            st.write(answer)
+            st.write("**Relevant Sources:**")
+            for i, source in enumerate(sources, 1):
+                st.write(f"Source {i}:")
+                st.text(source)
+
+def test_api_page():
+    st.header("API Test")
+    if st.button("Run API Test"):
+        with st.spinner("Testing API..."):
+            result = test_api()
+        st.write(result)
+
+def main():
+    st.title("Financial Insights Application")
+
+    # Initialize session state
+    if 'page' not in st.session_state:
+        st.session_state['page'] = "API Keys"
+
+    # Create sidebar
+    st.sidebar.title("Navigation")
+    page = st.sidebar.radio("Go to", ["API Keys", "Financial Data", "Document Analysis", "API Test"])
+
+    # Update session state
+    st.session_state['page'] = page
+
+    # Display the selected page
+    if st.session_state['page'] == "API Keys":
+        api_keys_page()
+    elif st.session_state['page'] == "Financial Data":
+        financial_data_page()
+    elif st.session_state['page'] == "Document Analysis":
+        document_analysis_page()
+    elif st.session_state['page'] == "API Test":
+        test_api_page()
 
 if __name__ == "__main__":
     main()
