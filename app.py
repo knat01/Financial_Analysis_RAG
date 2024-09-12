@@ -1,6 +1,7 @@
 import streamlit as st
 from data_processing import fetch_financial_data, process_financial_data, generate_financial_insights
 from report_analysis import process_annual_report, answer_question_from_report
+from test_api import test_api
 import os
 
 def api_keys_page():
@@ -12,6 +13,7 @@ def api_keys_page():
         st.session_state['openai_api_key'] = openai_api_key
         st.session_state['financial_api_key'] = financial_api_key
         os.environ['OPENAI_API_KEY'] = openai_api_key
+        os.environ['ALPHA_VANTAGE_API_KEY'] = financial_api_key
         st.success("API Keys saved successfully!")
 
 def financial_data_page():
@@ -71,6 +73,13 @@ def document_analysis_page():
                 st.write(f"Source {i}:")
                 st.text(source)
 
+def test_api_page():
+    st.header("API Test")
+    if st.button("Run API Test"):
+        with st.spinner("Testing API..."):
+            result = test_api()
+        st.write(result)
+
 def main():
     st.title("Financial Insights Application")
 
@@ -80,7 +89,7 @@ def main():
 
     # Create sidebar
     st.sidebar.title("Navigation")
-    page = st.sidebar.radio("Go to", ["API Keys", "Financial Data", "Document Analysis"])
+    page = st.sidebar.radio("Go to", ["API Keys", "Financial Data", "Document Analysis", "API Test"])
 
     # Update session state
     st.session_state['page'] = page
@@ -92,6 +101,8 @@ def main():
         financial_data_page()
     elif st.session_state['page'] == "Document Analysis":
         document_analysis_page()
+    elif st.session_state['page'] == "API Test":
+        test_api_page()
 
 if __name__ == "__main__":
     main()
