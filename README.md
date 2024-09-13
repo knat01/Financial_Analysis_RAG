@@ -4,6 +4,13 @@
 
 The **Financial Insights Application** is a powerful, AI-driven tool that helps users gain comprehensive insights into publicly traded companies. By combining financial data APIs with natural language processing through OpenAI's language models, this application offers key metrics, interactive visualizations, and AI-generated insights to help users understand a company’s financial health. The application is built using **Streamlit** for rapid development and a user-friendly interface.
 
+## Screen Recording
+
+[![Watch the demo](https://img.youtube.com/vi/etLcaK7pp3U/maxresdefault.jpg)](https://www.youtube.com/watch?v=etLcaK7pp3U)
+
+Click the image above to watch a screen recording of the Financial Insights Application in action. In this demo, you'll see how the app retrieves real-time financial data, provides AI-powered insights, and generates interactive visualizations for company analysis.
+
+
 ## Key Features
 
 - **Financial Data Retrieval**: Fetch real-time financial data for any publicly traded company using the Alpha Vantage API.
