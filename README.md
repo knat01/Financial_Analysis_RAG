@@ -7,7 +7,7 @@ The **Financial Insights Application** is a powerful, AI-driven tool that helps 
 ## Screen Recording
 
 [![Watch the demo](https://img.youtube.com/vi/etLcaK7pp3U/maxresdefault.jpg)](https://www.youtube.com/watch?v=etLcaK7pp3U)
-
+https://github.com/knat01/Financial_Analysis_RAG/blob/main/12.09.2024_19.43.59_REC.mp4
 Click the image above to watch a screen recording of the Financial Insights Application in action. In this demo, you'll see how the app retrieves real-time financial data, provides AI-powered insights, and generates interactive visualizations for company analysis.
 
 
