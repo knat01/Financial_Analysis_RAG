@@ -30,7 +30,7 @@ The **Financial Insights Application** is a powerful, AI-driven tool that helps 
    - **LangChain** enables seamless integration of language models with the financial analysis process. It is used for document processing, allowing the application to answer user queries about uploaded financial reports.
 
 ### 6. **LlamaIndex**
-    - **LlamaIndex** powers the document analysis feature. It enables efficient indexing of annual reports and other financial documents, allowing the application to quickly search and retrieve relevant information for answering user questions.
+   - **LlamaIndex** powers the document analysis feature. It enables efficient indexing of annual reports and other financial documents, allowing the application to quickly search and retrieve relevant information for answering user questions.
 
 ## Installation
 
