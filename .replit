@@ -59,6 +59,10 @@ args = "Git Python Checkpoint"
 task = "workflow.run"
 args = "Git Checkpoint Operations"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Final Python Commit"
+
 [[workflows.workflow]]
 name = "Start Streamlit App"
 author = "agent"
@@ -257,6 +261,28 @@ args = """
     git add . &&
     git commit -m \"Update .replit configuration\" &&
     git tag -a v1.0-python -m \"Version 1.0 - Complete Python implementation\" &&
+    git push origin main --tags
+    """
+
+[[workflows.workflow]]
+name = "Git Final Python Commit"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+    git config --global user.email \"ai.assistant@example.com\" &&
+    git config --global user.name \"AI Assistant\" &&
+    git config pull.rebase true &&
+    git add . &&
+    git commit -m \"Final Python implementation before Java microservice\" &&
     git push origin main --tags
     """
 
