@@ -51,6 +51,10 @@ args = "Git Sync"
 task = "workflow.run"
 args = "Git Config and Sync"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Python Checkpoint"
+
 [[workflows.workflow]]
 name = "Start Streamlit App"
 author = "agent"
@@ -213,6 +217,32 @@ args = """
     git pull origin main &&
     git add . &&
     git commit -m \"Complete implementation of Financial Insights Application\" &&
+    git push origin main --tags
+    """
+
+[[workflows.workflow]]
+name = "Git Python Checkpoint"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+    git config --global user.email \"ai.assistant@example.com\" &&
+    git config --global user.name \"AI Assistant\" &&
+    git config pull.rebase true &&
+    git stash &&
+    git pull origin main &&
+    git stash pop &&
+    git add . &&
+    git commit -m \"Pre-Java implementation checkpoint: Working Python version\" &&
+    git tag -a v1.0-python -m \"Version 1.0 - Working Python implementation\" &&
     git push origin main --tags
     """
 
