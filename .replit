@@ -232,19 +232,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = """
-
-    git config --global user.email \"ai.assistant@example.com\" &&
-    git config --global user.name \"AI Assistant\" &&
-    git config pull.rebase true &&
-    git stash &&
-    git pull origin main &&
-    git stash pop &&
-    git add . &&
-    git commit -m \"Pre-Java implementation checkpoint: Working Python version\" &&
-    git tag -a v1.0-python -m \"Version 1.0 - Working Python implementation\" &&
-    git push origin main --tags
-    """
+args = "git status && git describe --tags"
 
 [deployment]
 run = ["sh", "-c", "streamlit run app.py --server.port 5000"]
