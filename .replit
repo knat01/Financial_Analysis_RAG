@@ -39,6 +39,18 @@ args = "Git Configure and Push"
 task = "workflow.run"
 args = "Git Checkpoint"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Push Tags"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Sync"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Config and Sync"
+
 [[workflows.workflow]]
 name = "Start Streamlit App"
 author = "agent"
@@ -140,6 +152,68 @@ args = """
     git tag -a v1.0-python -m \"Version 1.0 - Working Python implementation\" &&
     git push origin main --tags &&
     git describe --tags
+    """
+
+[[workflows.workflow]]
+name = "Git Push Tags"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+    git config --global user.email \"ai.assistant@example.com\" &&
+    git config --global user.name \"AI Assistant\" &&
+    git push origin main --tags
+    """
+
+[[workflows.workflow]]
+name = "Git Sync"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+    git config --global user.email \"ai.assistant@example.com\" &&
+    git config --global user.name \"AI Assistant\" &&
+    git pull origin main &&
+    git push origin main --tags
+    """
+
+[[workflows.workflow]]
+name = "Git Config and Sync"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+    git config --global user.email \"ai.assistant@example.com\" &&
+    git config --global user.name \"AI Assistant\" &&
+    git config pull.rebase true &&
+    git pull origin main &&
+    git add . &&
+    git commit -m \"Complete implementation of Financial Insights Application\" &&
+    git push origin main --tags
     """
 
 [deployment]
