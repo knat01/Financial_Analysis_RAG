@@ -27,6 +27,18 @@ args = "Git Commit"
 task = "workflow.run"
 args = "Git Commit and Tag"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Push"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Configure and Push"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Git Checkpoint"
+
 [[workflows.workflow]]
 name = "Start Streamlit App"
 author = "agent"
@@ -59,7 +71,7 @@ agentRequireRestartOnSave = false
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "git add . && git commit -m 'Checkpoint: Financial analysis tool with working annual report upload and analysis' && git status"
+args = "git add . && git commit -m 'Final commit: Financial analysis tool with working features' && git status"
 
 [[workflows.workflow]]
 name = "Git Commit and Tag"
@@ -77,6 +89,56 @@ args = """
     git add . &&
     git commit -m \"Checkpoint: Financial analysis tool with working annual report upload and analysis\" &&
     git tag -a v1.0 -m \"Version 1.0 - Working financial analysis tool\" &&
+    git describe --tags
+    """
+
+[[workflows.workflow]]
+name = "Git Push"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "git push origin main"
+
+[[workflows.workflow]]
+name = "Git Configure and Push"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+    git config --global user.email \"ai.assistant@example.com\" &&
+    git config --global user.name \"AI Assistant\" &&
+    git push origin main
+    """
+
+[[workflows.workflow]]
+name = "Git Checkpoint"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+    git config --global user.email \"ai.assistant@example.com\" &&
+    git config --global user.name \"AI Assistant\" &&
+    git add . &&
+    git commit -m \"Pre-Java implementation checkpoint: Working Python version\" &&
+    git tag -a v1.0-python -m \"Version 1.0 - Working Python implementation\" &&
+    git push origin main --tags &&
     git describe --tags
     """
 
